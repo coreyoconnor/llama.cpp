@@ -288,10 +288,11 @@ static void shift_context() {
 
 static std::string chat_add_and_format(const std::string &role, const std::string &content) {
     common_chat_msg new_msg;
+    std::map<std::string, std::string> chat_template_kwargs;
     new_msg.role = role;
     new_msg.content = content;
     auto formatted = common_chat_format_single(
-            g_chat_templates.get(), chat_msgs, new_msg, role == ROLE_USER, /* use_jinja */ false);
+            g_chat_templates.get(), chat_msgs, new_msg, role == ROLE_USER, /* use_jinja */ false, chat_template_kwargs);
     chat_msgs.push_back(new_msg);
     LOGi("%s: Formatted and added %s message: \n%s\n", __func__, role.c_str(), formatted.c_str());
     return formatted;

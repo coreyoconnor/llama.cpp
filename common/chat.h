@@ -234,7 +234,8 @@ std::string common_chat_format_single(const struct common_chat_templates * tmpls
                                       const std::vector<common_chat_msg> & past_msg,
                                       const common_chat_msg &              new_msg,
                                       bool                                 add_ass,
-                                      bool                                 use_jinja);
+                                      bool                                 use_jinja,
+                                      const std::map<std::string, std::string> & chat_template_kwargs);
 
 // Returns an example of formatted chat
 std::string common_chat_format_example(const struct common_chat_templates *       tmpls,

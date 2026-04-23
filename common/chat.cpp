@@ -512,11 +512,13 @@ std::string common_chat_format_single(const struct common_chat_templates * tmpls
                                       const std::vector<common_chat_msg> & past_msg,
                                       const common_chat_msg &              new_msg,
                                       bool                                 add_ass,
-                                      bool                                 use_jinja) {
+                                      bool                                 use_jinja,
+                                      const std::map<std::string, std::string> & chat_template_kwargs) {
     common_chat_templates_inputs inputs;
     inputs.use_jinja = use_jinja;
     inputs.add_bos   = tmpls->add_bos;
     inputs.add_eos   = tmpls->add_eos;
+    inputs.chat_template_kwargs = chat_template_kwargs;
 
     std::string fmt_past_msg;
     if (!past_msg.empty()) {
@@ -2167,6 +2169,11 @@ static common_chat_params common_chat_templates_apply_jinja(const struct common_
         workaround::func_args_not_string(params.messages);
     }
 
+    params.extra_context = common_chat_extra_context();
+    for (auto el : inputs.chat_template_kwargs) {
+        params.extra_context[el.first] = json::parse(el.second);
+    }
+
     params.add_generation_prompt = false;
     std::string no_gen_prompt    = common_chat_template_direct_apply_impl(tmpl, params);
     params.add_generation_prompt = true;
@@ -2175,11 +2182,6 @@ static common_chat_params common_chat_templates_apply_jinja(const struct common_
     params.generation_prompt     = diff.right + diff.suffix;
 
     params.add_generation_prompt = inputs.add_generation_prompt;
-
-    params.extra_context = common_chat_extra_context();
-    for (auto el : inputs.chat_template_kwargs) {
-        params.extra_context[el.first] = json::parse(el.second);
-    }
 
     if (!inputs.json_schema.empty()) {
         params.json_schema = json::parse(inputs.json_schema);
